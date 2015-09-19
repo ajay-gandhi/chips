@@ -84,28 +84,36 @@ var ready_services = {};
 
 var module_dirs = fs.readdirSync(__dirname + '/modules');
 
-// Attempt to include messaging modules
-module_dirs.forEach(function (path) {
-  try {
-    var module = require('./modules/' + path + '/index');
-    if (module.init) {
-      module
-        .init(conf)
-        .then(function (initialized) {
-          ready_services[path] = initialized;
-        })
-        .catch(function (e) {
-          console.error('Error including "' + path + '":', e);
-          ready_services[path] = false;
-        });
-    } else {
-      ready_services[path] = module;
-    }
-  } catch (e) {
-    console.error('Error including "' + path + '":', e);
-    ready_services[path] = false;
-  }
+// Ignore dotfiles
+module_dirs = module_dirs.filter(function (path) {
+  return (path.charAt(0) !== '.');
 });
+
+
+Promise
+  .all(module_dirs.map(function (path) {
+    var module = require('./modules/' + path + '/index');
+    return module.init(conf);
+  }))
+  .then(function (all_initialized) {
+    all_initialized.forEach(function (initialized, i) {
+      if (initialized) {
+        ready_services[module_dirs[i]] = initialized;
+      } else {
+        ready_services[module_dirs[i]] = false;
+      }
+    });
+
+    // Send ready services to renderer
+    var module_commands = {};
+    Object.keys(ready_services).forEach(function (service) {
+      if (ready_services[service] && ready_services[service].get_commands) {
+        module_commands[service] = ready_services[service].get_commands();
+      }
+    });
+    main_window.webContents.send('commands', module_commands);
+  });
+
 
 ////////////////////////////////// IPC Evensts //////////////////////////////////
 
@@ -115,24 +123,21 @@ module_dirs.forEach(function (path) {
 // });
 
 // Receives a request to send a message, params are self-explanatory
-ipc.on('send-message', function(event, service, name, message) {
-  console.log('Message', name, 'through', service, 'saying', message);
+ipc.on('action', function (event, args) {
+
+  console.log('Service:',  args['module'],
+              '\nAction:', args['action'],
+              '\nArgs:',   args['args']);
+
+  var service = ready_services[args['module']];
 
   // Only continue if requested service is ready
-  if (ready_services[service]) {
-    ready_services[service]
-      .act('text', {
-        name: name,
-        text: message
-      })
-      .then(function () {
-        // Success
-        event.sender.send('message-sent', true, name, message);
-      })
-      .catch(function (e) {
-        // Failure
-        console.error(e);
-        event.sender.send('message-sent', false, name, e);
+  if (service) {
+    service
+      .act(args['action'], args['args'])
+      .then(function (res) {
+        // Send the result, whatever it is
+        event.sender.send('response', res);
       });
   }
 });

@@ -16,41 +16,38 @@ var message_service = function (service) {
 };
 
 if (annyang) {
-  var commands = {
-    'facebook :name *message': message_service('facebook'),
-    'imessage :name *message': message_service('imessage'),
-    'testing': function () { console.log('it works'); }
-  };
 
-  // Add commands and start annyang
-  annyang.addCommands(commands);
-  annyang.start();
+  // Receive the modules' commands
+  ipc.on('commands', function (modules) {
+
+    var commands = {};
+    Object.keys(modules).forEach(function (mkey) {
+      Object.keys(modules[mkey]).forEach(function (c) {
+        console.log(c, modules[mkey][c]);
+        commands[c] = function () {
+          ipc.send('action', {
+            'module': mkey,
+            'action': modules[mkey][c],
+            'args':   Array.prototype.slice.call(arguments)
+          });
+        }
+      });
+    });
+
+    // Add our commands to annyang
+    annyang.addCommands(commands);
+
+    // Start listening.
+    annyang.start();
+  });
 
 } else {
   console.log('Annyang is not included.');
 }
 
 // Notify user!
-// Third argument is either the error (if failed) or the message (if successful)
-ipc.on('message-sent', function (success, name, third) {
-  ui.wave = 'paused';
-  console.log('Message sent success:', success);
-
-  if (success) {
-    var notif = {
-      title: 'Sent',
-      body:  'Messaged ' + name + ' saying "' + third + '"'
-    }
-
-  } else {
-    var notif = {
-      title: 'Sent',
-      body:  'Message to ' + name + ' failed to send'
-    }
-  }
-
-  new Notification(notif.title, notif);
-
+ipc.on('response', function (res) {
+  new Notification(res.title, res);
 });
 
 
