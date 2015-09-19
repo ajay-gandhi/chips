@@ -14,13 +14,13 @@ module.exports =
     start()
 
     .then ->
-      throw new Error 'NO_MESSAGE'   if !opts.text
-      throw new Error 'NO_RECIPIENT' if !opts.name
+      throw new Error 'NO_MESSAGE'   if !opts[0]
+      throw new Error 'NO_RECIPIENT' if !opts[1]
     
     .then ->
       switch 'SEND_MESSAGE'
         when 'text'
-          imessage.send_message(opts.name, opts.text)
+          imessage.send_message(opts[0], opts[1])
     
     .then (res) ->
       status : 200

@@ -64,13 +64,19 @@ var init_the_thing = function(e) {
   view.onFrame = function() {
     var step = view.size.width / (amount + 1);
     var scale = view.size.height / 1.75;
+    var THRES = 0.2;
+
     analyserL.getByteFrequencyData(freqByteData);
     var leftBands = getEqualizerBands(freqByteData, true);
+
     analyserR.getByteFrequencyData(freqByteData);
     var rightBands = getEqualizerBands(freqByteData, true);
+
     for (var i = 1; i <= amount-1; i++) {
-      leftPath.segments[i].point = [i * step, leftBands[amount-1] * scale]//[i * step, -leftBands[i - 1] * scale];
-      rightPath.segments[i].point = [i * step, leftBands[amount-1] * -scale]//[i * step, -rightBands[i - 1] * scale * (flip ? -1 : 1)];
+      var left_y = (leftBands[amount-1] < THRES) ? 0 : leftBands[amount-1] * scale;
+      var right_y = (rightBands[amount-1] < THRES) ? 0 : rightBands[amount-1] * scale;
+      leftPath.segments[i].point = [i * step, left_y]//[i * step, -leftBands[i - 1] * scale];
+      rightPath.segments[i].point = [i * step, -right_y]//[i * step, -rightBands[i - 1] * scale * (flip ? -1 : 1)];
     }
     leftPath.smooth();
     rightPath.smooth();
