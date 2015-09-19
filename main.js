@@ -5,11 +5,12 @@ var Configstore = require('configstore'),
     fs          = require('fs');
 
 // Electron modules
-var app           = require('app'),
-    BrowserWindow = require('browser-window'),
-    ipc           = require('ipc'),
-    Tray          = require('tray'),
-    Menu          = require('menu');
+var app            = require('app'),
+    BrowserWindow  = require('browser-window'),
+    ipc            = require('ipc'),
+    Tray           = require('tray'),
+    Menu           = require('menu'),
+    globalShortcut = require('global-shortcut');
 
 var conf = new Configstore(require('./package.json').name);
 
@@ -44,6 +45,11 @@ app.on('ready', function() {
     }
   });
 
+  // Register a 'ctrl+`' shortcut listener.
+  var ret = globalShortcut.register('ctrl+`', function() {
+    main_window.show();
+  });
+
   // Create menubar
   menubar = new Tray(__dirname + '/images/icon_smallTemplate.png');
   menubar.setPressedImage(__dirname + '/images/icon_small_white.png');
@@ -52,6 +58,9 @@ app.on('ready', function() {
     {
       label:   'Listening!',
       enabled: false
+    },
+    {
+      type: 'separator'
     },
     {
       id:    'fb-login',
