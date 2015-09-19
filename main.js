@@ -68,6 +68,7 @@ ipc.on('new-setting', function(event, key, value) {
 });
 
 ipc.on('send-message', function(event, service, name, message) {
+  console.log('a;lksdjfakl;sjdfl;kajsd;fl');
   console.log('Message', name, 'through', service, 'saying', message);
 
   if (ready_services[service]) {

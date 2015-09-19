@@ -3,21 +3,14 @@ var ipc = require('ipc');
 
 ////////////////////////////////// Messaging ///////////////////////////////////
 
-var send_message = function (service, name, message) {
-  var full_name = name;
-  service = service.toLowerCase();
-
-  if (service === 'facebook' || service === 'face book') {
-    ipc.send('send-message', 'facebook', full_name, message);
-
-  } else if (service === 'imessage') {
-    ipc.send('send-message', 'imessage', full_name, message);
-  }
-}
-
 if (annyang) {
   var commands = {
-    ':service :name *message': send_message,
+    'facebook :name *message': function (n, m) {
+      ipc.send('send-message', 'facebook', n, m);
+    },
+    'imessage :name *message': function (n, m){
+      ipc.send('send-message', 'imessage', n, m);
+    },
     'testing': function () { console.log('it works'); }
   }
 

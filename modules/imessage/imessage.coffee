@@ -24,7 +24,9 @@ class iMessage
     # Make sure we have the phone number
     .then   () => (@get_imessage_address name)
     .then (im) => new Promise (res, rej) ->
-      control 'imessage', ['send', im, "'#{message}'"], ->
+      message = message.replace("'", "\'")
+      control 'imessage', ['send', im, "'#{message}'"], (err) ->
+        rej err if err
         res {status : 'SENT'}
     
     # Catch any errors
