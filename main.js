@@ -45,6 +45,12 @@ app.on('ready', function() {
     }
   });
 
+  // Just hide window, never close it
+  main_window.on('close', function (e) {
+    main_window.hide();
+    e.preventDefault();
+  });
+
   // Register a 'ctrl+`' shortcut listener.
   var ret = globalShortcut.register('ctrl+`', function() {
     main_window.show();
