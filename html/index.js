@@ -23,8 +23,20 @@ if (annyang) {
   console.log('Annyang is not included.');
 }
 
-ipc.on('message-sent', function (success) {
-  console.log('Message sent success:', success);
+ipc.on('message-sent', function (success, name, third) {
+  if (success) {
+    var notif = {
+      title: 'Sent',
+      body:  'Messaged ' + name + ' saying "' + third + '"'
+    }
+
+  } else {
+    var notif = {
+      title: 'Sent',
+      body:  'Message to ' + name + ' failed to send'
+    }
+  }
+  new Notification(notif.title, notif);
 });
 
 /////////////////////////////////// Settings ///////////////////////////////////

@@ -121,9 +121,12 @@ ipc.on('send-message', function(event, service, name, message) {
         text: message
       })
       .then(function () {
-        event.sender.send('message-sent', true);
+        event.sender.send('message-sent', true, name, message);
       })
-      .catch(console.error);
+      .catch(function (e) {
+        console.error(e);
+        event.sender.send('message-sent', false, name, e);
+      });
   }
 });
 
