@@ -8,7 +8,7 @@ if (annyang) {
     'facebook :name *message': function (n, m) {
       ipc.send('send-message', 'facebook', n, m);
     },
-    'imessage :name *message': function (n, m){
+    'imessage :name *message': function (n, m) {
       ipc.send('send-message', 'imessage', n, m);
     },
     'testing': function () { console.log('it works'); }
@@ -28,9 +28,6 @@ ipc.on('message-sent', function (success) {
 });
 
 /////////////////////////////////// Settings ///////////////////////////////////
-
-var isReady = false,
-    hideFb  = false;
 
 $(document).ready(function () {
   $('button#fb-submit').click(function (e) {
