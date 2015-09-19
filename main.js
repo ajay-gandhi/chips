@@ -1,6 +1,7 @@
 
 // Node modules
-var Configstore = require('configstore');
+var Configstore = require('configstore'),
+    fs          = require('fs');
 
 // Electron modules
 var app           = require('app'),
@@ -27,23 +28,34 @@ app.on('ready', function() {
 
 ////////////////////////////// Messaging Modules ///////////////////////////////
 
-var fb = require('./modules/facebook/facebook');
+var ready_services = {};
 
-var ready_services = {
-  'facebook': false,
-  'imessage': false
-};
+var module_dirs = fs.readdirSync(__dirname + '/modules');
 
-fb
-  .init(conf.get('fb_username'), conf.get('fb_password'))
-  .then(function () {
-    ready_services['facebook'] = true;
-  })
-  .catch(function () {
-    ready_services['facebook'] = false;
-  });
+// Attempt to include messaging modules
+for (var i = 0; i < module_dirs.length; i++) {
+  try {
+    var module = require('./modules/' + module_dirs[i] + '/index');
+    if (module.init) {
+      module
+        .init(conf)
+        .then(function () {
+          console.log('good');
+          ready_services[module_dirs[i]] = module;
+        })
+        .catch(function () {
+          ready_services[module_dirs[i]] = false;
+        });
+    } else {
+      ready_services[module_dirs[i]] = module;
+    }
+  } catch (e) {
+    console.error('Error including "' + module_dirs[i] + '":', e);
+    ready_services[module_dirs[i]] = false;
+  }
+}
 
-////////////////////////////////// IPC Events //////////////////////////////////
+////////////////////////////////// IPC Evensts //////////////////////////////////
 
 ipc.on('new-setting', function(event, key, value) {
   conf.set(key, value);
@@ -51,16 +63,15 @@ ipc.on('new-setting', function(event, key, value) {
 
 ipc.on('send-message', function(event, service, name, message) {
 
-  if (service === 'facebook' && ready_services['facebook']) {
-    fb
-      .act('message', {
+  if (ready_services[service]) {
+    ready_services[service]
+      .act('text', {
         name: name,
         text: message
       })
-      .then(function () {
+      .then(function (r) {
         event.sender.send('message-sent', true);
       })
       .catch(console.error);
   }
-
 });
