@@ -8,7 +8,7 @@
     "configstore": "^1.2.1",
     "es6-promise": "^3.0.2",
     "is-phone": "^2.0.0",
-    "plant.js": "^0.0.1"
+    "plant.js": "git+https://github.com/mrkev/plant.js.git"
   },
   "devDependencies": {},
   "scripts": {
