@@ -45,7 +45,6 @@ module.exports = (function () {
           } else {
             reject();
           }
-
         })
         .catch(function (e) {
           console.error(e);
@@ -84,6 +83,6 @@ module.exports = (function () {
     });
   }
 
-  return new FacebookMessenger;
+  return new FacebookMessenger();
 
 })();

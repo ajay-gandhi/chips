@@ -19,6 +19,8 @@ app.on('ready', function() {
   mainWindow.loadUrl('file://' + __dirname + '/html/index.html');
 });
 
+///////////////////////// Sketch af, just for testing //////////////////////////
+
 // Initialize Facebook messager
 var fb_config = require('./test.json'),
     fb_msg    = require('./facebook');
