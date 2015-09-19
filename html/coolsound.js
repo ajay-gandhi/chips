@@ -29,13 +29,13 @@ var getEqualizerBands = function (data) {
  */
 var init_the_thing = function(e) {
   var leftPath = new Path({
-    strokeColor: 'red',
-    opacity: 0.5
+    strokeColor: '#DC3522',
+    opacity: 1
   });
 
   var rightPath = new Path({
-   strokeColor: 'green',
-   opacity: 0.5
+   strokeColor: '#D9CB9E',
+   opacity: 1 
   });
 
   var paths = [leftPath, rightPath];
@@ -52,7 +52,7 @@ var init_the_thing = function(e) {
   var group = new Group({
     children: [leftPath, rightPath],
     transformContent: false,
-    strokeWidth: 20,
+    strokeWidth: 10,
     strokeJoin: 'round',
     strokeCap: 'round',
     pivot: leftPath.position,
@@ -68,7 +68,7 @@ var init_the_thing = function(e) {
     var leftBands = getEqualizerBands(freqByteData, true);
     analyserR.getByteFrequencyData(freqByteData);
     var rightBands = getEqualizerBands(freqByteData, true);
-    for (var i = 1; i <= amount; i++) {
+    for (var i = 1; i <= amount-1; i++) {
       leftPath.segments[i].point = [i * step, leftBands[amount-1] * scale]//[i * step, -leftBands[i - 1] * scale];
       rightPath.segments[i].point = [i * step, leftBands[amount-1] * -scale]//[i * step, -rightBands[i - 1] * scale * (flip ? -1 : 1)];
     }

@@ -1,3 +1,4 @@
+require('coffee-script/register');
 
 // Node modules
 var Configstore = require('configstore'),
@@ -32,7 +33,7 @@ var menubar_template;
 
 app.on('ready', function() {
   // Create the main window.
-  main_window = new BrowserWindow({ width: 800, height: 600 });
+  main_window = new BrowserWindow({ width: 800, height: 600, 'title-bar-style': 'hidden' });
   main_window.openDevTools();
   main_window.loadUrl('file://' + __dirname + '/html/index.html');
 

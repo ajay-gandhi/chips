@@ -1,6 +1,8 @@
 is_phone = require 'is-phone'
 control  = require './control'
 
+start = -> Promise.resolve null
+
 class iMessage
   constructor: (env) ->
 
@@ -23,14 +25,19 @@ class iMessage
 
   send_message: (name, message) -> 
     Promise.resolve(null)
-    # Make sure we have the phone number
-    .then   () => (@get_imessage_address name)
+    # Make sure we have the im
+    .then   () => @get_imessage_address name
+    
+
     .then (im) => new Promise (res, rej) ->
       message = message.replace("'", "\'")
       control 'imessage', ['send', im, "'#{message}'"], (err) ->
         rej err if err
-        res {status : 'SENT'}
-    
+        res
+          status : 'SENT'
+          name : name
+          message : message
+
     # Catch any errors
     .catch (err) ->
       console.error err

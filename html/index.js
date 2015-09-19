@@ -17,7 +17,6 @@ var message_service = function (service) {
 
 if (annyang) {
   var commands = {
-<<<<<<< HEAD
     'facebook :name *message': message_service('facebook'),
     'imessage :name *message': message_service('imessage'),
     'testing': function () { console.log('it works'); }
