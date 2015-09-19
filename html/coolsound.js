@@ -54,7 +54,7 @@ var init_the_thing = function(e) {
     transformContent: false,
     strokeWidth: 20,
     strokeJoin: 'round',
-    strokeCap: 'butt',
+    strokeCap: 'round',
     pivot: leftPath.position,
     position: view.center
   });

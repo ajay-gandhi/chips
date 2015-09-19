@@ -1,11 +1,11 @@
 'use strict';
 /* global require, module, console, __dirname */
 
-var exec    = require('child_process').exec;
+var exec = require('child_process').exec;
 
 module.exports = function (file, args, cb) {
   if (args === null || args === undefined) {
-    args = []
+    args = [];
   }
 
   if (cb === 'log') {

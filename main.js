@@ -145,8 +145,6 @@ var fb_login = function () {
   if (!fb_login_win) {
     fb_login_win = new BrowserWindow({ width: 400, height: 400 });
   }
-
-  fb_login_win.openDevTools();
   fb_login_win.loadUrl('file://' + __dirname + '/html/facebook.html');
 }
 
