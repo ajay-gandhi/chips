@@ -1,0 +1,31 @@
+{
+  "name": "chips",
+  "version": "0.0.1",
+  "description": "Send messages while eating chips",
+  "main": "",
+  "dependencies": {
+    "es6-promise": "^3.0.2",
+    "plant.js": "^0.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajay-gandhi/chips.git"
+  },
+  "keywords": [
+    "message",
+    "text",
+    "facebook",
+    "groupme",
+    "imessage"
+  ],
+  "author": "Kevin and Ajay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ajay-gandhi/chips/issues"
+  },
+  "homepage": "https://github.com/ajay-gandhi/chips#readme"
+}
