@@ -17,6 +17,7 @@ var message_service = function (service) {
 
 if (annyang) {
   var commands = {
+<<<<<<< HEAD
     'facebook :name *message': message_service('facebook'),
     'imessage :name *message': message_service('imessage'),
     'testing': function () { console.log('it works'); }
@@ -30,9 +31,27 @@ if (annyang) {
   console.log('Annyang is not included.');
 }
 
-ipc.on('message-sent', function (success) {
+// Notify user!
+// Third argument is either the error (if failed) or the message (if successful)
+ipc.on('message-sent', function (success, name, third) {
   ui.wave = 'paused';
   console.log('Message sent success:', success);
+
+  if (success) {
+    var notif = {
+      title: 'Sent',
+      body:  'Messaged ' + name + ' saying "' + third + '"'
+    }
+
+  } else {
+    var notif = {
+      title: 'Sent',
+      body:  'Message to ' + name + ' failed to send'
+    }
+  }
+
+  new Notification(notif.title, notif);
+
 });
 
 
@@ -47,4 +66,9 @@ $(document).ready(function () {
     ipc.send('new-setting', 'fb-password', $('input#fb-password').val());
     ipc.send('open-module', 'facebook');
   });
+});
+
+// Facebook config exists, hide login
+ipc.on('hide-facebook', function () {
+  $('div#fb-login-form').hide();
 });

@@ -11,6 +11,13 @@ module.exports = (function () {
     this.home = 'https://m.facebook.com';
   }
 
+  /**
+   * Initializes the Facebook object by logging into Facebook headlessly
+   *
+   * @param [Object] conf - An instance of Configstore for the app
+   *
+   * @returns Promise - Resolves to the initialized object (self) or rejects
+   */
   FacebookMessenger.prototype.init = function (conf) {
     var self = this;
 
@@ -43,7 +50,7 @@ module.exports = (function () {
             self.email = creds.email;
             resolve(self);
           } else {
-            reject();
+            reject('Login failed.');
           }
         })
         .catch(function (e) {
@@ -52,6 +59,9 @@ module.exports = (function () {
     });
   }
 
+  /**
+   * Conducts the specified action
+   */
   FacebookMessenger.prototype.act = function (action, opts) {
     var self = this;
 
@@ -77,7 +87,7 @@ module.exports = (function () {
           })
           .catch(function (e) {
             console.error(e);
-            reject();
+            reject(e);
           });
     });
   }
