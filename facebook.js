@@ -86,4 +86,4 @@ module.exports = (function () {
 
   return new FacebookMessenger;
 
-})()
+})();
