@@ -2,7 +2,7 @@
   "name": "chips",
   "version": "0.0.1",
   "description": "Send messages while eating chips",
-  "main": "",
+  "main": "main.js",
   "dependencies": {
     "es6-promise": "^3.0.2",
     "plant.js": "^0.0.1"

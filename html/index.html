@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Chips</title>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/annyang/2.0.0/annyang.min.js"></script>
+  <script>
+  var send_message = function (name, message, service) {
+    console.log(arguments);
+    // if (message === 'facebook' || message === 'face book')
+  }
+
+  if (annyang) {
+    var commands = {
+      'message :name saying :message through :service': send_message,
+    }
+
+    // Add our commands to annyang
+    annyang.addCommands(commands);
+
+    // Start listening.
+    annyang.start();
+  }
+  </script>
+</head>
+<body>
+  <h1>Chips</h1>
+</body>
+</html>
