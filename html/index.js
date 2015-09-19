@@ -17,10 +17,14 @@ if (annyang) {
     Object.keys(modules).forEach(function (mkey) {
       Object.keys(modules[mkey]).forEach(function (c) {
         commands[c] = function () {
+          var args = Array.prototype.slice.call(arguments);
+
+          $('div#status').append("<p>" + c.split(' ')[0] + ' ' + args.join(' ') + "</p>" );
+
           ipc.send('action', {
             'module': mkey,
             'action': modules[mkey][c],
-            'args':   Array.prototype.slice.call(arguments)
+            'args'  : args
           });
         }
       });

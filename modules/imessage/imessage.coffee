@@ -13,6 +13,10 @@ class iMessage
       stdout = stdout
         .split(', ')
         .filter((x) -> !!x)[0]
+
+      rej new Error('No imid') if !stdout
+
+      stdout = stdout
         .replace(/\s/g, '')
         .replace(/\,/g, '')
         .replace(/\)/g, '')
@@ -23,7 +27,8 @@ class iMessage
       rej new Error('No imid') if !stdout
       res stdout
 
-  send_message: (name, message) -> 
+  send_message: (name, message) ->
+    console.log 'asdfyasdf'
     Promise.resolve(null)
     # Make sure we have the im
     .then   () => @get_imessage_address name

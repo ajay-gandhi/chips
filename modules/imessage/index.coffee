@@ -18,8 +18,8 @@ module.exports =
       throw new Error 'NO_RECIPIENT' if !opts[1]
     
     .then ->
-      switch 'SEND_MESSAGE'
-        when 'text'
+      switch actn
+        when 'SEND_MESSAGE'
           imessage.send_message(opts[0], opts[1])
     
     .then (res) ->
