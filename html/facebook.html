@@ -7,8 +7,9 @@
   var ipc = require('ipc');
 
   $(document).ready(function () {
-    $('button#fb-submit').click(function (e) {
+    $('form#fb-login-form').submit(function(e) {
       e.preventDefault();
+      $('button#fb-submit').prop('disabled', true);
       var user = $('input#fb-username').val();
       var pass = $('input#fb-password').val()
       ipc.send('fb-login', user, pass);
@@ -17,6 +18,7 @@
 
   ipc.on('fb-login-success', function (success) {
     if (!success) {
+      $('button#fb-submit').prop('disabled', false);
       $('h1#status').text('Login failed.');
     }
   });
@@ -24,10 +26,10 @@
 </head>
 <body>
   <h1 id="status"></h1>
-  <div id="fb-login-form">
+  <form id="fb-login-form">
     <input type="text" id="fb-username" /><br />
     <input type="password" id="fb-password" /><br />
     <button id="fb-submit">Save</button>
-  </div>
+  </form>
 </body>
 </html>
