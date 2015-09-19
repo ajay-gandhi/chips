@@ -9,23 +9,27 @@ class iMessage
   get_imessage_address: (name) -> new Promise (res, rej) ->
     control 'contacts', ['general', "'#{name}'"], (err, stdout, stderr) ->
       rej err if err
-      console.error stderr if stderr
-      stdout = stdout
-        .split(', ')
-        .filter((x) -> !!x)[0]
+      try
+        console.error stderr if stderr
+        stdout = stdout
+          .split(', ')
+          .filter((x) -> !!x)[0]
 
-      rej new Error('No imid') if !stdout
+        rej new Error('No imid') if !stdout
 
-      stdout = stdout
-        .replace(/\s/g, '')
-        .replace(/\,/g, '')
-        .replace(/\)/g, '')
-        .replace(/\(/g, '')
-        .replace(/\+/g, '')
-        .replace(/\-/g, '')
+        stdout = stdout
+          .replace(/\s/g, '')
+          .replace(/\,/g, '')
+          .replace(/\)/g, '')
+          .replace(/\(/g, '')
+          .replace(/\+/g, '')
+          .replace(/\-/g, '')
 
-      rej new Error('No imid') if !stdout
-      res stdout
+        rej new Error('No imid') if !stdout
+        res stdout
+      catch e
+        rej e
+      
 
   send_message: (name, message) ->
     console.log 'asdfyasdf'
@@ -42,10 +46,6 @@ class iMessage
           status : 'SENT'
           name : name
           message : message
-
-    # Catch any errors
-    .catch (err) ->
-      console.error err
 
 module.exports = new iMessage()
         

@@ -19,7 +19,7 @@ if (annyang) {
         commands[c] = function () {
           var args = Array.prototype.slice.call(arguments);
 
-          $('div#status').append("<p>" + c.split(' ')[0] + ' ' + args.join(' ') + "</p>" );
+          $('div#status').prepend("<p>" + c.split(' ')[0] + ' ' + args.join(' ') + "</p>" );
 
           ipc.send('action', {
             'module': mkey,
