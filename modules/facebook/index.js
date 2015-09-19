@@ -60,14 +60,29 @@ module.exports = (function () {
   }
 
   /**
+   * Returns a mapping from commands to their actions. See Annyang docs for more
+   * info on commands
+   *
+   * @returns Object
+   */
+  FacebookMessenger.prototype.get_commands = function () {
+    return {
+      'facebook :name *message': 'SEND_MESSAGE'
+    }
+  }
+
+  /**
    * Conducts the specified action
    */
-  FacebookMessenger.prototype.act = function (action, opts) {
+  FacebookMessenger.prototype.act = function (action, args) {
     var self = this;
+
+    var name = args[0],
+        text = args[1];
 
     return new Promise(function (resolve, reject) {
       self.browser
-        .visit(self.home + '/search/?query=' + encodeURIComponent(opts.name))
+        .visit(self.home + '/search/?query=' + encodeURIComponent(name))
           .then(function ($) {
 
             // Visit first profile
@@ -77,17 +92,24 @@ module.exports = (function () {
           .then(function ($) {
 
             // Fill message content
-            $.by_name('body', 'form#composer_form').val(opts.text);
+            $.by_name('body', 'form#composer_form').val(text);
             var prev_action = $('form#composer_form').attr('action');
             $('form#composer_form').attr('action', self.home + prev_action);
             return self.browser.submit($('form#composer_form'));
           })
           .then(function () {
-            resolve();
+            resolve({
+              status: 200,
+              title:  'Sent',
+              body:   'Messaged ' + name + ' saying "' + text + '"'
+            });
           })
-          .catch(function (e) {
-            console.error(e);
-            reject(e);
+          .catch(function () {
+            resolve({
+              status: 404,
+              title:  'Failed',
+              body:   'Message to ' + name + ' failed to send'
+            });
           });
     });
   }
