@@ -8,13 +8,6 @@ var ui = {
 
 ////////////////////////////////// Messaging ///////////////////////////////////
 
-var message_service = function (service) {
-  return function (n, m) {
-    console.log(service, n, m);
-    ipc.send('send-message', service, n, m);
-  };
-};
-
 if (annyang) {
 
   // Receive the modules' commands
@@ -23,7 +16,6 @@ if (annyang) {
     var commands = {};
     Object.keys(modules).forEach(function (mkey) {
       Object.keys(modules[mkey]).forEach(function (c) {
-        console.log(c, modules[mkey][c]);
         commands[c] = function () {
           ipc.send('action', {
             'module': mkey,
@@ -49,9 +41,6 @@ if (annyang) {
 ipc.on('response', function (res) {
   new Notification(res.title, res);
 });
-
-
-
 
 /////////////////////////////////// Settings ///////////////////////////////////
 
