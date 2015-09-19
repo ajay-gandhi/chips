@@ -24,6 +24,12 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({ width: 800, height: 600 });
   mainWindow.openDevTools();
   mainWindow.loadUrl('file://' + __dirname + '/html/index.html');
+
+  mainWindow.webContents.on('did-finish-load', function () {
+    if (conf.get('fb-username')) {
+      mainWindow.webContents.send('hide-facebook');
+    }
+  });
 });
 
 ////////////////////////////// Messaging Modules ///////////////////////////////

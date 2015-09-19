@@ -36,6 +36,9 @@ ipc.on('message-sent', function (success) {
 
 /////////////////////////////////// Settings ///////////////////////////////////
 
+var isReady = false,
+    hideFb  = false;
+
 $(document).ready(function () {
   $('button#fb-submit').click(function (e) {
     e.preventDefault();
@@ -43,4 +46,9 @@ $(document).ready(function () {
     ipc.send('new-setting', 'fb-password', $('input#fb-password').val());
     ipc.send('open-module', 'facebook');
   });
+});
+
+// Facebook config exists, hide login
+ipc.on('hide-facebook', function () {
+  $('div#fb-login-form').hide();
 });
