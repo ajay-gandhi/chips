@@ -41,11 +41,11 @@ ipc.on('message-sent', function (success) {
 
 /////////////////////////////////// Settings ///////////////////////////////////
 
-// $(document).ready(function () {
-//   $('button#fb-submit').click(function (e) {
-//     e.preventDefault();
-//     ipc.send('new-setting', 'fb-username', $('input#fb-username').val());
-//     ipc.send('new-setting', 'fb-password', $('input#fb-password').val());
-//     ipc.send('open-module', 'facebook');
-//   });
-// });
+$(document).ready(function () {
+  $('button#fb-submit').click(function (e) {
+    e.preventDefault();
+    ipc.send('new-setting', 'fb-username', $('input#fb-username').val());
+    ipc.send('new-setting', 'fb-password', $('input#fb-password').val());
+    ipc.send('open-module', 'facebook');
+  });
+});
