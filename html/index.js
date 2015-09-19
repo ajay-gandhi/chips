@@ -1,31 +1,42 @@
+'use strict';
+/* global require, console, annyang, window, $ */
 
 var ipc = require('ipc');
+var ui = {
+  wave : 'listening'
+}
 
 ////////////////////////////////// Messaging ///////////////////////////////////
 
+var message_service = function (service) {
+  return function (n, m) {
+    console.log(service, n, m);
+    ipc.send('send-message', service, n, m);
+  };
+};
+
 if (annyang) {
   var commands = {
-    'facebook :name *message': function (n, m) {
-      ipc.send('send-message', 'facebook', n, m);
-    },
-    'imessage :name *message': function (n, m){
-      ipc.send('send-message', 'imessage', n, m);
-    },
+    'facebook :name *message': message_service('facebook'),
+    'imessage :name *message': message_service('imessage'),
     'testing': function () { console.log('it works'); }
-  }
+  };
 
-  // Add our commands to annyang
+  // Add commands and start annyang
   annyang.addCommands(commands);
-
-  // Start listening.
   annyang.start();
+
 } else {
   console.log('Annyang is not included.');
 }
 
 ipc.on('message-sent', function (success) {
+  ui.wave = 'paused';
   console.log('Message sent success:', success);
 });
+
+
+
 
 /////////////////////////////////// Settings ///////////////////////////////////
 

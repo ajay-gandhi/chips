@@ -17,6 +17,8 @@ class iMessage
         .replace(/\(/g, '')
         .replace(/\+/g, '')
         .replace(/\-/g, '')
+
+      rej new Error('No imid') if !stdout
       res stdout
 
   send_message: (name, message) -> 

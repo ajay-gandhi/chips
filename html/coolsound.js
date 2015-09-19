@@ -69,8 +69,8 @@ var init_the_thing = function(e) {
     analyserR.getByteFrequencyData(freqByteData);
     var rightBands = getEqualizerBands(freqByteData, true);
     for (var i = 1; i <= amount; i++) {
-      leftPath.segments[i].point = [i * step, -leftBands[i - 1] * scale];
-      rightPath.segments[i].point = [i * step, -rightBands[i - 1] * scale * (flip ? -1 : 1)];
+      leftPath.segments[i].point = [i * step, leftBands[amount-1] * scale]//[i * step, -leftBands[i - 1] * scale];
+      rightPath.segments[i].point = [i * step, leftBands[amount-1] * -scale]//[i * step, -rightBands[i - 1] * scale * (flip ? -1 : 1)];
     }
     leftPath.smooth();
     rightPath.smooth();
