@@ -1,7 +1,13 @@
 
+// Node modules
+var Configstore = require('configstore');
+
+// Electron modules
 var app           = require('app'),
     BrowserWindow = require('browser-window'),
     ipc           = require('ipc');
+
+var conf = new Configstore(require('./package.json').name);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -19,18 +25,34 @@ app.on('ready', function() {
   mainWindow.loadUrl('file://' + __dirname + '/html/index.html');
 });
 
-///////////////////////// Sketch af, just for testing //////////////////////////
+////////////////////////////// Messaging Modules ///////////////////////////////
 
-// Initialize Facebook messager
-var fb_config = require('./test.json'),
-    fb_msg    = require('./facebook');
+var fb = require('./modules/facebook/facebook');
 
-fb_msg.init(fb_config.username, fb_config.password);
+var ready_services = {
+  'facebook': false,
+  'imessage': false
+};
+
+fb
+  .init(conf.get('fb_username'), conf.get('fb_password'))
+  .then(function () {
+    ready_services['facebook'] = true;
+  })
+  .catch(function () {
+    ready_services['facebook'] = false;
+  });
+
+////////////////////////////////// IPC Events //////////////////////////////////
+
+ipc.on('new-setting', function(event, key, value) {
+  conf.set(key, value);
+});
 
 ipc.on('send-message', function(event, service, name, message) {
 
-  if (service === 'facebook') {
-    fb_msg
+  if (service === 'facebook' && ready_services['facebook']) {
+    fb
       .act('message', {
         name: name,
         text: message
