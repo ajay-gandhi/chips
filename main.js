@@ -33,27 +33,27 @@ var ready_services = {};
 var module_dirs = fs.readdirSync(__dirname + '/modules');
 
 // Attempt to include messaging modules
-for (var i = 0; i < module_dirs.length; i++) {
+module_dirs.forEach(function (path) {
   try {
-    var module = require('./modules/' + module_dirs[i] + '/index');
+    var module = require('./modules/' + path + '/index');
     if (module.init) {
       module
         .init(conf)
-        .then(function () {
-          console.log('good');
-          ready_services[module_dirs[i]] = module;
+        .then(function (initialized) {
+          ready_services[path] = initialized;
         })
-        .catch(function () {
-          ready_services[module_dirs[i]] = false;
+        .catch(function (e) {
+          console.error('Error including "' + path + '":', e);
+          ready_services[path] = false;
         });
     } else {
-      ready_services[module_dirs[i]] = module;
+      ready_services[path] = module;
     }
   } catch (e) {
-    console.error('Error including "' + module_dirs[i] + '":', e);
-    ready_services[module_dirs[i]] = false;
+    console.error('Error including "' + path + '":', e);
+    ready_services[path] = false;
   }
-}
+});
 
 ////////////////////////////////// IPC Evensts //////////////////////////////////
 
@@ -62,6 +62,7 @@ ipc.on('new-setting', function(event, key, value) {
 });
 
 ipc.on('send-message', function(event, service, name, message) {
+  console.log('Message', name, 'through', service, 'saying', message);
 
   if (ready_services[service]) {
     ready_services[service]
@@ -69,9 +70,26 @@ ipc.on('send-message', function(event, service, name, message) {
         name: name,
         text: message
       })
-      .then(function (r) {
+      .then(function () {
         event.sender.send('message-sent', true);
       })
       .catch(console.error);
+  }
+});
+
+// Attempts to re-require and initialize a module
+ipc.on('open-module', function(event, service) {
+  var module = require('./modules/' + service + '/index');
+  if (module.init) {
+    module
+      .init(conf)
+      .then(function () {
+        ready_services[service] = module;
+      })
+      .catch(function () {
+        ready_services[service] = false;
+      });
+  } else {
+    ready_services[service] = module;
   }
 });

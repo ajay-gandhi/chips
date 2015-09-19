@@ -15,8 +15,8 @@ module.exports = (function () {
     var self = this;
 
     var creds = {
-      email: conf.get('username'),
-      pass:  conf.get('password')
+      email: conf.get('fb-username'),
+      pass:  conf.get('fb-password')
     }
 
     var options = {
@@ -40,14 +40,13 @@ module.exports = (function () {
         .then(function ($) {
           // Confirm login
           if ($('title').text() === 'Facebook') {
-            self.email = email;
-            resolve();
+            self.email = creds.email;
+            resolve(self);
           } else {
             reject();
           }
         })
         .catch(function (e) {
-          console.error(e);
           reject(e);
         });
     });
