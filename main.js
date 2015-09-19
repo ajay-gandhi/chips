@@ -24,11 +24,6 @@ var main_window  = null,
 
 var menubar_template;
 
-// Quit when all windows are closed.
-// app.on('window-all-closed', function() {
-//   app.quit();
-// });
-
 // Hide dock icon
 // app.dock.hide();
 
@@ -37,6 +32,8 @@ app.on('ready', function() {
   main_window = new BrowserWindow({
     width:  250,
     height: 300,
+    resizable: false,
+    fullscreen: false,
     'title-bar-style': 'hidden'
   });
   main_window.loadUrl('file://' + __dirname + '/html/index.html');
@@ -46,6 +43,12 @@ app.on('ready', function() {
     if (conf.get('fb-username')) {
       main_window.webContents.send('hide-facebook');
     }
+  });
+
+  // Just hide window, never close it
+  main_window.on('close', function (e) {
+    main_window.hide();
+    e.preventDefault();
   });
 
   // Register a 'ctrl+`' shortcut listener.
@@ -140,7 +143,8 @@ ipc.on('action', function (event, args) {
 
   console.log('Service:',  args['module'],
               '\nAction:', args['action'],
-              '\nArgs:',   args['args']);
+              '\nArgs:',   args['args'],
+              '\n');
 
   var service = ready_services[args['module']];
 
