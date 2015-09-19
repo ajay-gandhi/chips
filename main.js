@@ -45,7 +45,8 @@ app.on('ready', function() {
   });
 
   // Create menubar
-  menubar = new Tray(__dirname + '/icon_small.png');
+  menubar = new Tray(__dirname + '/images/icon_small.png');
+  menubar.setPressedImage(__dirname + '/images/icon_small_white.png');
 
   menubar_template = [
     {
