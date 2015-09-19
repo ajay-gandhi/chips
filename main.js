@@ -137,7 +137,8 @@ ipc.on('action', function (event, args) {
 
   console.log('Service:',  args['module'],
               '\nAction:', args['action'],
-              '\nArgs:',   args['args']);
+              '\nArgs:',   args['args'],
+              '\n');
 
   var service = ready_services[args['module']];
 
