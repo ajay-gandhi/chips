@@ -4,19 +4,27 @@ control  = require './control'
 class iMessage
   constructor: (env) ->
 
-  get_phone: (name) -> new Promise (res, rej) ->
-    control 'contacts', ['phone', "'#{name}'"], (err, stdout, stderr) ->
+  get_imessage_address: (name) -> new Promise (res, rej) ->
+    control 'contacts', ['general', "'#{name}'"], (err, stdout, stderr) ->
       rej err if err
-      res stdout.replace(/\s/g, '')
+      console.error stderr if stderr
+      stdout = stdout
+        .split(', ')
+        .filter((x) -> !!x)[0]
+        .replace(/\s/g, '')
+        .replace(/\,/g, '')
+        .replace(/\)/g, '')
+        .replace(/\(/g, '')
+        .replace(/\+/g, '')
+        .replace(/\-/g, '')
+      res stdout
 
-  send_message: (name, message) ->
+  send_message: (name, message) -> 
+    Promise.resolve(null)
     # Make sure we have the phone number
-    Promise.resolve(null).then =>
-      if is_phone name then name else @get_phone name
-    
-    # Send the message
-    .then (phone) => new Promise (res, rej) ->
-      control 'imessage', ['send', phone, "'#{message}'"], ->
+    .then   () => (@get_imessage_address name)
+    .then (im) => new Promise (res, rej) ->
+      control 'imessage', ['send', im, "'#{message}'"], ->
         res {status : 'SENT'}
     
     # Catch any errors
@@ -27,8 +35,8 @@ module.exports = new iMessage()
         
 # Test
 if require.main == module
-  module.exports.get_phone('Ajay Gandhi')
-  module.exports.send_message('Ajay Gandhi', 'I love you')
+  # module.exports.get_imessage_address('Bodas').then console.log
+  module.exports.send_message('Bodas', '<3').then console.log
 
 
 
