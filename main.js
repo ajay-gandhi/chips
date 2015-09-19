@@ -24,11 +24,6 @@ var main_window  = null,
 
 var menubar_template;
 
-// Quit when all windows are closed.
-// app.on('window-all-closed', function() {
-//   app.quit();
-// });
-
 // Hide dock icon
 // app.dock.hide();
 
@@ -37,6 +32,8 @@ app.on('ready', function() {
   main_window = new BrowserWindow({
     width:  250,
     height: 300,
+    resizable: false,
+    fullscreen: false,
     'title-bar-style': 'hidden'
   });
   main_window.loadUrl('file://' + __dirname + '/html/index.html');
