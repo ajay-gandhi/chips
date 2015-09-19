@@ -3,12 +3,8 @@ var ipc = require('ipc');
 
 ////////////////////////////////// Messaging ///////////////////////////////////
 
-var send_dummy = function (n, s) {
-  send_message(n, 'chavez', 'hello wordl', s);
-}
-
-var send_message = function (name, last, message, service) {
-  var full_name = name + ' ' + last;
+var send_message = function (service, name, message) {
+  var full_name = name;
   service = service.toLowerCase();
 
   if (service === 'facebook' || service === 'face book') {
@@ -21,8 +17,7 @@ var send_message = function (name, last, message, service) {
 
 if (annyang) {
   var commands = {
-    'message :name :last saying :message through :service': send_dummy,
-    'message :name through :service': send_dummy,
+    ':service :name *message': send_message,
     'testing': function () { console.log('it works'); }
   }
 
