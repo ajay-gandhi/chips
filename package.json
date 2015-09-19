@@ -5,6 +5,7 @@
   "main": "",
   "dependencies": {
     "es6-promise": "^3.0.2",
+    "is-phone": "^2.0.0",
     "plant.js": "^0.0.1"
   },
   "devDependencies": {},
