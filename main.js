@@ -136,6 +136,9 @@ ipc.on('action', function (event, args) {
     service
       .act(args['action'], args['args'])
       .then(function (res) {
+        if (res.status === 404) {
+          console.error(res);
+        } 
         // Send the result, whatever it is
         event.sender.send('response', res);
       });

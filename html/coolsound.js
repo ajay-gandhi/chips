@@ -52,7 +52,7 @@ var init_the_thing = function(e) {
   var group = new Group({
     children: [leftPath, rightPath],
     transformContent: false,
-    strokeWidth: 10,
+    strokeWidth: 5,
     strokeJoin: 'round',
     strokeCap: 'round',
     pivot: leftPath.position,
