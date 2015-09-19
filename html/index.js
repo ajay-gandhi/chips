@@ -1,6 +1,10 @@
 
 var ipc = require('ipc');
 
+var send_dummy = function (n, s) {
+  send_message(n, 'chavez', 'hello wordl', s);
+}
+
 var send_message = function (name, last, message, service) {
   var full_name = name + ' ' + last;
   service = service.toLowerCase();
@@ -13,21 +17,18 @@ var send_message = function (name, last, message, service) {
   }
 }
 
-setTimeout(function () {
-  send_message('kevin', 'chavez', 'hello wordl', 'facebook');
-}, 5000);
+if (annyang) {
+  var commands = {
+    'message :name :last saying :message through :service': send_dummy,
+    'message :name through :service': send_dummy,
+    'testing': function () { console.log('it works') }
+  }
 
-ipc.on('message-sent', function (success) {
-  console.log('message sent:', success);
-});
-// if (annyang) {
-//   var commands = {
-//     'message :name :last saying :message through :service': send_message,
-//   }
+  // Add our commands to annyang
+  annyang.addCommands(commands);
 
-//   // Add our commands to annyang
-//   annyang.addCommands(commands);
-
-//   // Start listening.
-//   annyang.start();
-// }
+  // Start listening.
+  annyang.start();
+} else {
+  console.log('Annyang is not included.');
+}

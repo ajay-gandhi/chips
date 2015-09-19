@@ -11,12 +11,12 @@ module.exports = (function () {
     this.home = 'https://m.facebook.com';
   }
 
-  FacebookMessenger.prototype.init = function (email, password) {
+  FacebookMessenger.prototype.init = function (conf) {
     var self = this;
 
     var creds = {
-      email: email,
-      pass:  password
+      email: conf.get('username'),
+      pass:  conf.get('password')
     }
 
     var options = {
