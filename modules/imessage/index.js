@@ -10,7 +10,7 @@ module.exports = {
           if (!opts.text) return new Error('NO_MESSAGE');
           if (!opts.name) return new Error('NO_RECIPIENT');
           return imessage
-            .send_message(opts.message, opts.recipient)
+            .send_message(opts.name, opts.text)
           break;
       }
     });
