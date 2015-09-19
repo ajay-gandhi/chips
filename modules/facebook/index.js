@@ -11,6 +11,13 @@ module.exports = (function () {
     this.home = 'https://m.facebook.com';
   }
 
+  /**
+   * Initializes the Facebook object by logging into Facebook headlessly
+   *
+   * @param [Object] conf - An instance of Configstore for the app
+   *
+   * @returns Promise - Resolves to the initialized object (self) or rejects
+   */
   FacebookMessenger.prototype.init = function (conf) {
     var self = this;
 
@@ -52,6 +59,9 @@ module.exports = (function () {
     });
   }
 
+  /**
+   * Conducts the specified action
+   */
   FacebookMessenger.prototype.act = function (action, opts) {
     var self = this;
 

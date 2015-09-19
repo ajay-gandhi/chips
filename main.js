@@ -14,8 +14,8 @@ var conf = new Configstore(require('./package.json').name);
 
 ////////////////////////////////// App Window //////////////////////////////////
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+// Keep a global reference of the objects that are created later
+// If you don't, they will be closed automatically bc garbage collection
 var main_window  = null,
     menubar      = null,
     fb_login_win = null;
@@ -31,11 +31,12 @@ var menubar_template;
 // app.dock.hide();
 
 app.on('ready', function() {
-  // Create the browser window.
+  // Create the main window.
   main_window = new BrowserWindow({ width: 800, height: 600 });
   main_window.openDevTools();
   main_window.loadUrl('file://' + __dirname + '/html/index.html');
 
+  // Hide Facebook login if already logged in
   main_window.webContents.on('did-finish-load', function () {
     if (conf.get('fb-username')) {
       main_window.webContents.send('hide-facebook');
@@ -107,13 +108,16 @@ module_dirs.forEach(function (path) {
 
 ////////////////////////////////// IPC Evensts //////////////////////////////////
 
-ipc.on('new-setting', function(event, key, value) {
-  conf.set(key, value);
-});
+// Updates persistent config
+// ipc.on('new-setting', function(event, key, value) {
+//   conf.set(key, value);
+// });
 
+// Receives a request to send a message, params are self-explanatory
 ipc.on('send-message', function(event, service, name, message) {
   console.log('Message', name, 'through', service, 'saying', message);
 
+  // Only continue if requested service is ready
   if (ready_services[service]) {
     ready_services[service]
       .act('text', {
@@ -121,9 +125,11 @@ ipc.on('send-message', function(event, service, name, message) {
         text: message
       })
       .then(function () {
+        // Success
         event.sender.send('message-sent', true, name, message);
       })
       .catch(function (e) {
+        // Failure
         console.error(e);
         event.sender.send('message-sent', false, name, e);
       });
@@ -144,7 +150,7 @@ var fb_login = function () {
   fb_login_win.loadUrl('file://' + __dirname + '/html/facebook.html');
 }
 
-// Attempts to re-require and initialize a module
+// Attempts to re init FB module
 ipc.on('fb-login', function(event, user, pass) {
   conf.set('fb-username', user);
   conf.set('fb-password', pass);
@@ -153,6 +159,7 @@ ipc.on('fb-login', function(event, user, pass) {
   module
     .init(conf)
     .then(function (initialized) {
+      // Success!
       ready_services['facebook'] = initialized;
       fb_login_win.close();
 
@@ -165,6 +172,7 @@ ipc.on('fb-login', function(event, user, pass) {
       menubar.setContextMenu(menubar_menu);
     })
     .catch(function () {
+      // Failure
       // Unset in config
       conf.set('fb-username', false);
       conf.set('fb-password', false);

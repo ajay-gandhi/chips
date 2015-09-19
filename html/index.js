@@ -23,6 +23,8 @@ if (annyang) {
   console.log('Annyang is not included.');
 }
 
+// Notify user!
+// Third argument is either the error (if failed) or the message (if successful)
 ipc.on('message-sent', function (success, name, third) {
   if (success) {
     var notif = {
@@ -36,6 +38,7 @@ ipc.on('message-sent', function (success, name, third) {
       body:  'Message to ' + name + ' failed to send'
     }
   }
+
   new Notification(notif.title, notif);
 });
 
