@@ -43,7 +43,7 @@ module.exports = (function () {
             self.email = creds.email;
             resolve(self);
           } else {
-            reject();
+            reject('Login failed.');
           }
         })
         .catch(function (e) {
@@ -77,7 +77,7 @@ module.exports = (function () {
           })
           .catch(function (e) {
             console.error(e);
-            reject();
+            reject(e);
           });
     });
   }
