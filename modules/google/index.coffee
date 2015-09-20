@@ -1,6 +1,5 @@
 
 Promise  = (require 'es6-promise').Promise
-applescript = require('applescript')
 open = require 'open'
 
 Array::random = ->
