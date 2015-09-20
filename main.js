@@ -23,15 +23,18 @@ var conf = new Configstore(require('./package.json').name);
 // If you don't, they will be closed automatically bc garbage collection
 var main_window  = null,
     menubar      = null,
-    fb_login_win = null;
+    login_window = null;
 
-var menubar_template;
+var menubar_template,
+    current_menu_items;
+
+var ready_services = {};
 
 // Hide dock icon
 app.dock.hide();
 
 app.on('ready', function() {
-  // Create the main window.
+  // Create the main window
   main_window = new BrowserWindow({
     width:  250,
     height: 300,
@@ -39,16 +42,26 @@ app.on('ready', function() {
   });
   main_window.loadUrl('file://' + __dirname + '/html/index.html');
 
-  // Hide Facebook login if already logged in
-  main_window.webContents.on('did-finish-load', function () {
-    if (conf.get('fb-username')) {
-      main_window.webContents.send('hide-facebook');
-    }
+  // Create login window
+  login_window = new BrowserWindow({
+    width:  300,
+    height: 200,
+    resizable: false,
+    fullscreen: false,
+    'title-bar-style': 'hidden'
   });
+  login_window.loadUrl('file://' + __dirname + '/html/login.html');
+  login_window.hide();
 
   // Just hide window, never close it
   main_window.on('close', function (e) {
     main_window.hide();
+    e.preventDefault();
+  });
+
+  // Just hide window, never close it
+  main_window.on('close', function (e) {
+    login_window.hide();
     e.preventDefault();
   });
 
@@ -65,82 +78,96 @@ app.on('ready', function() {
       enabled : false
     },
     { id      : 'show-window',
-      label   : 'Show window...',
+      label   : 'Show',
       click   : toggle_window
     },
     { type    : 'separator' },
-    
-
-    { id:    'fb-login',
-      label: 'Login to Facebook',
-      click: fb_login
-    },
-    { type: 'separator'},
-
-
-    { label: 'Quit',
+    {
+      label: 'Quit',
       accelerator: 'Command+Q',
       click: function() { app.quit(); }
     },
   ];
 
-  // Remove facebook login option (already logged in)
-  if (conf.get('fb-username')) {
-    menubar_template = menubar_template.filter(function (menu_item) {
-      return (menu_item.id !== 'fb-login');
-    });
-  }
+  current_menu_items = menubar_template;
 
   var menubar_menu = Menu.buildFromTemplate(menubar_template);
   menubar.setContextMenu(menubar_menu);
-});
 
 ////////////////////////////// Messaging Modules ///////////////////////////////
 
-var ready_services = {},
-    module_dirs     = fs.readdirSync(__dirname + '/modules');
+  /**
+   * Returns a function that displays the login window for this service
+   */
+  var create_login_requester = function (name) {
+    return function () {
+      login_window.show();
+      login_window.webContents.send('service-name', name);
+    }
+  }
 
-// Ignore dotfiles
-module_dirs = module_dirs.filter(function (path) {
-  return (path.charAt(0) !== '.');
+  var module_dirs = fs.readdirSync(__dirname + '/modules');
+
+  // Ignore dotfiles
+  module_dirs = module_dirs.filter(function (path) {
+    return (path.charAt(0) !== '.');
+  });
+
+  Promise
+
+    // Initialize all modules
+    .all(module_dirs.map(function (path) {
+      var module = require('./modules/' + path + '/index');
+      return module.init(conf.get(path));
+    }))
+
+    // Make sure they all initialized well
+    .then(function (all_initialized) {
+      all_initialized.forEach(function (initialized, i) {
+        ready_services[module_dirs[i]] = initialized;
+      });
+
+      // Send ready services to renderer
+      var module_commands = {};
+      Object.keys(ready_services).forEach(function (service) {
+        if (ready_services[service] && ready_services[service].get_commands) {
+          module_commands[service] = ready_services[service].get_commands();
+        }
+      });
+
+      main_window.webContents.send('commands', module_commands);
+
+      // Add menu bar items
+      var addl_menu_items = module_dirs.reduce(function (acc, path) {
+        var module = require('./modules/' + path + '/index');
+        if (module.menu_login && !ready_services[path]) {
+          var module_name = module.menu_login();
+          return acc.concat({
+            id:    module_name.toLowerCase(),
+            label: 'Login to ' + module_name,
+            click: create_login_requester(module_name)
+          });
+        } else {
+          return acc;
+        }
+      }, []);
+
+      if (addl_menu_items.length) {
+        var new_menu_set = menubar_template
+          .slice(0, 1)
+          .concat({ type: 'separator' })
+          .concat(addl_menu_items)
+          .concat(menubar_template.slice(1));
+
+        current_menu_items = new_menu_set;
+        var new_menu = Menu.buildFromTemplate(new_menu_set);
+        menubar.setContextMenu(new_menu);
+      }
+    });
 });
 
 
-Promise
-
-  // Initialize all modules
-  .all(module_dirs.map(function (path) {
-    var module = require('./modules/' + path + '/index');
-    return module.init(conf);
-  }))
-
-  // Make sure they all initialized well
-  .then(function (all_initialized) {
-    all_initialized.forEach(function (initialized, i) {
-      if (initialized) {
-        ready_services[module_dirs[i]] = initialized;
-      } else {
-        ready_services[module_dirs[i]] = false;
-      }
-    });
-
-    // Send ready services to renderer
-    var module_commands = {};
-    Object.keys(ready_services).forEach(function (service) {
-      if (ready_services[service] && ready_services[service].get_commands) {
-        module_commands[service] = ready_services[service].get_commands();
-      }
-    });
-    main_window.webContents.send('commands', module_commands);
-  });
-
-
 ////////////////////////////////// IPC Evensts //////////////////////////////////
-
-// Updates persistent config
-// ipc.on('new-setting', function(event, key, value) {
-//   conf.set(key, value);
-// });
 
 // Receives a request to send a message, params are self-explanatory
 ipc.on('action', function (event, args) {
@@ -169,51 +196,45 @@ ipc.on('action', function (event, args) {
   }
 });
 
-/////////////////////////////// Other Functions ////////////////////////////////
-
 var toggle_window = function () {
   if (main_window.isVisible()) { main_window.hide(); }
   else { main_window.show(); }
 };
 
-/**
- * Opens a window to login to Facebook
- */
-var fb_login = function () {
-  if (!fb_login_win) {
-    fb_login_win = new BrowserWindow({ width: 400, height: 400 });
+ipc.on('try-login', function (event, service, user, pass) {
+  var module = require('./modules/' + service + '/index');
+
+  var creds = {
+    username: user,
+    password: pass
   }
-  fb_login_win.loadUrl('file://' + __dirname + '/html/facebook.html');
-};
 
-// Attempts to re init FB module
-ipc.on('fb-login', function(event, user, pass) {
-  conf.set('fb-username', user);
-  conf.set('fb-password', pass);
-
-  var module = require('./modules/facebook/index');
   module
-    .init(conf)
+    .init(creds)
     .then(function (initialized) {
-      // Success!
-      ready_services['facebook'] = initialized;
-      fb_login_win.close();
+      ready_services[service] = initialized;
 
-      // Remove facebook login option from menu bar
-      var menu_items = menubar_template.filter(function (menu_item) {
-        return (menu_item.id !== 'fb-login');
-      });
+      // Save if successful
+      if (initialized) {
+        conf.set(service, creds);
+        login_window.hide();
 
-      var menubar_menu = Menu.buildFromTemplate(menu_items);
-      menubar.setContextMenu(menubar_menu);
-    })
-    .catch(function () {
-      // Failure
-      // Unset in config
-      conf.set('fb-username', false);
-      conf.set('fb-password', false);
+        // Remove menu bar
+        current_menu_items = current_menu_items.filter(function (item) {
+          return (item.id !== service);
+        });
+        console.log(current_menu_items);
+        var new_menu = Menu.buildFromTemplate(current_menu_items);
+        menubar.setContextMenu(new_menu);
 
-      ready_services['facebook'] = false;
-      event.sender.send('fb-login-success', false);
+        // Send new possible commands
+        var new_commands = {};
+            new_commands[service] = ready_services[service].get_commands();
+
+        main_window.webContents.send('commands', new_commands);
+
+      } else {
+        event.sender.send('login-success', false);
+      }
     });
 });

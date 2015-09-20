@@ -34,9 +34,10 @@ if (annyang) {
     // Add our commands to annyang
     annyang.addCommands(commands);
 
-    // Start listening.
-    annyang.start();
   });
+
+  // Start listening.
+  annyang.start();
 
 } else {
   console.log('Annyang is not included.');
