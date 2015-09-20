@@ -72,8 +72,8 @@ app.on('ready', function() {
   var ret = globalShortcut.register('ctrl+`', toggle_window);
 
   // Create menubar
-  menubar = new Tray(__dirname + '/images/icon_smallTemplate.png');
-  menubar.setPressedImage(__dirname + '/images/icon_small_white.png');
+  menubar = new Tray(__dirname + '/assets/menu_iconTemplate.png');
+  menubar.setPressedImage(__dirname + '/assets/menu_icon_white.png');
 
   menubar_template = [
     {
