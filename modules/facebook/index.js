@@ -8,6 +8,10 @@ module.exports = (function () {
   function FacebookMessenger() {
     this.browser = new Plant();
     this.home = 'https://m.facebook.com';
+    this.theme = {
+      main_color : '#3b5998',
+      secondary_color : 'white'
+    }
   }
 
   /**
@@ -20,7 +24,7 @@ module.exports = (function () {
   FacebookMessenger.prototype.init = function (creds) {
     var self = this;
 
-    if (!creds) return new Promise(function (r) { r(false); });
+    if (!creds) return Promise.resolve(false);
 
     var proper_props = {
       email: creds.username,

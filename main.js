@@ -46,7 +46,7 @@ app.on('ready', function() {
   login_window = new BrowserWindow({
     width:  300,
     height: 200,
-    resizable: false,
+    // resizable: false,
     fullscreen: false,
     'title-bar-style': 'hidden'
   });
@@ -97,10 +97,13 @@ app.on('ready', function() {
   /**
    * Returns a function that displays the login window for this service
    */
-  var create_login_requester = function (name) {
+  var create_login_requester = function (name, theme) {
     return function () {
       login_window.show();
-      login_window.webContents.send('service-name', name);
+      login_window.webContents.send('service-name', {
+        name: name,
+        theme: theme
+      });
     }
   }
 
@@ -133,9 +136,7 @@ app.on('ready', function() {
         }
       });
 
-      main_window.webContents.on('did-finish-load', function () {
-        main_window.webContents.send('commands', module_commands);
-      });
+      main_window.webContents.send('commands', module_commands);
 
       // Add menu bar items
       var addl_menu_items = module_dirs.reduce(function (acc, path) {
@@ -145,7 +146,7 @@ app.on('ready', function() {
           return acc.concat({
             id:    module_name.toLowerCase(),
             label: 'Login to ' + module_name,
-            click: create_login_requester(module_name)
+            click: create_login_requester(module_name, module.theme)
           });
         } else {
           return acc;

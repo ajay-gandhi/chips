@@ -22,23 +22,30 @@
   ipc.on('login-success', function (success) {
     if (!success) {
       $('button#submit').prop('disabled', false);
-      $('h3#status').text('Login failed.');
+      $('h4#status').text('Login failed.');
     }
   });
 
   // Receive service name
-  ipc.on('service-name', function (name) {
-    service = name.toLowerCase();
-    $('h2#name').text('Login to ' + name);
+  ipc.on('service-name', function (props) {
+    service = props.name.toLowerCase();
+    $('h2#name').text('Login to ' + props.name);
+    if (props.theme) {
+      var body = $('body');
+      var input = $('input');
+      body.css('background-color', props.theme.main_color);
+      body.css('color', props.theme.secondary_color);
+      input.css('color', props.theme.main_color);
+    }
   });
   </script>
   <style>
     body, html {
       padding: 0;
       margin: 0;
-      background-color: #374140;
+      background-color: #D9CB9E;
       text-align: center;
-      color: #D9CB9E;
+      color: #2A2C2B;
       font-family: 'Menlo', 'Andale Mono', monospace;
       overflow: none;
     }
@@ -54,32 +61,32 @@
     h2#name {
       margin: 10px 0 0 0;
     }
-    h3#status {
+    h4#status {
       margin: 15px 0;
-      color: red;
+      color: white;
       font-weight: lighter;
     }
 
     input {
       outline: none;
-      color: #DC3522;
+      color: #2A2C2B;
       font-size: 14px;
+      font-family: 'Menlo', 'Andale Mono', monospace;
       margin: 2px 0;
       padding: 3px;
       border: 1px solid #D9CB9E;
       border-radius: 3px;
-      background-color: #374140;
     }
     button {
-      outline: none;
+      font-family: 'Menlo', 'Andale Mono', monospace;
     }
   </style>
 </head>
 <body>
   <h2 id="name">Login</h2>
-  <h3 id="status">&nbsp;</h3>
+  <h4 id="status">&nbsp;</h3>
   <form id="login-form">
-    <input type="text" id="username" placeholder="Username" /><br />
+    <input type="text" id="username" placeholder="Username" autofocus='true'/><br />
     <input type="password" id="password" placeholder="Password" /><br />
     <button id="submit">Login</button>
   </form>
