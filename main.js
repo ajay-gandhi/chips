@@ -78,7 +78,7 @@ app.on('ready', function() {
       enabled : false
     },
     { id      : 'show-window',
-      label   : 'Show',
+      label   : 'Show window',
       click   : toggle_window
     },
     { type    : 'separator' },
@@ -197,8 +197,8 @@ ipc.on('action', function (event, args) {
 });
 
 var toggle_window = function () {
-  if (main_window.isVisible()) { main_window.hide(); }
-  else { main_window.show(); }
+  if (main_window.isVisible()) main_window.hide();
+  else                         main_window.show();
 };
 
 ipc.on('try-login', function (event, service, user, pass) {
@@ -223,7 +223,6 @@ ipc.on('try-login', function (event, service, user, pass) {
         current_menu_items = current_menu_items.filter(function (item) {
           return (item.id !== service);
         });
-        console.log(current_menu_items);
         var new_menu = Menu.buildFromTemplate(current_menu_items);
         menubar.setContextMenu(new_menu);
 
