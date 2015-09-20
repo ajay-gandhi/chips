@@ -265,7 +265,7 @@ header ul {
 
 header li {
 	list-style-type: none;
-  width:132px;
+  width:142px;
   height:15px;
 	margin-bottom: 12px;
 	line-height: 1em;
@@ -420,4 +420,9 @@ footer {
     font-size:12pt;
     color:#444;
   }
+}
+
+img.mainlogo {
+  margin: 20px 0 -20px 0;
+  border: none;
 }
