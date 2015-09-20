@@ -1,8 +1,11 @@
+'use strict';
+/* global require, console, __dirname */
 require('coffee-script/register');
 
 // Node modules
 var Configstore = require('configstore'),
-    fs          = require('fs');
+    fs          = require('fs'),
+    say         = require('say');
 
 // Electron modules
 var app            = require('app'),
@@ -25,15 +28,13 @@ var main_window  = null,
 var menubar_template;
 
 // Hide dock icon
-// app.dock.hide();
+app.dock.hide();
 
 app.on('ready', function() {
   // Create the main window.
   main_window = new BrowserWindow({
     width:  250,
     height: 300,
-    resizable: false,
-    fullscreen: false,
     'title-bar-style': 'hidden'
   });
   main_window.loadUrl('file://' + __dirname + '/html/index.html');
@@ -52,9 +53,7 @@ app.on('ready', function() {
   });
 
   // Register a 'ctrl+`' shortcut listener.
-  var ret = globalShortcut.register('ctrl+`', function() {
-    main_window.show();
-  });
+  var ret = globalShortcut.register('ctrl+`', toggle_window);
 
   // Create menubar
   menubar = new Tray(__dirname + '/images/icon_smallTemplate.png');
@@ -62,22 +61,24 @@ app.on('ready', function() {
 
   menubar_template = [
     {
-      label:   'Listening!',
-      enabled: false
+      label   : 'Listening!',
+      enabled : false
     },
-    {
-      type: 'separator'
+    { id      : 'show-window',
+      label   : 'Show window...',
+      click   : toggle_window
     },
-    {
-      id:    'fb-login',
+    { type    : 'separator' },
+    
+
+    { id:    'fb-login',
       label: 'Login to Facebook',
       click: fb_login
     },
-    {
-      type: 'separator'
-    },
-    {
-      label: 'Quit',
+    { type: 'separator'},
+
+
+    { label: 'Quit',
       accelerator: 'Command+Q',
       click: function() { app.quit(); }
     },
@@ -96,9 +97,8 @@ app.on('ready', function() {
 
 ////////////////////////////// Messaging Modules ///////////////////////////////
 
-var ready_services = {};
-
-var module_dirs = fs.readdirSync(__dirname + '/modules');
+var ready_services = {},
+    module_dirs     = fs.readdirSync(__dirname + '/modules');
 
 // Ignore dotfiles
 module_dirs = module_dirs.filter(function (path) {
@@ -107,10 +107,14 @@ module_dirs = module_dirs.filter(function (path) {
 
 
 Promise
+
+  // Initialize all modules
   .all(module_dirs.map(function (path) {
     var module = require('./modules/' + path + '/index');
     return module.init(conf);
   }))
+
+  // Make sure they all initialized well
   .then(function (all_initialized) {
     all_initialized.forEach(function (initialized, i) {
       if (initialized) {
@@ -155,7 +159,10 @@ ipc.on('action', function (event, args) {
       .then(function (res) {
         if (res.status === 404) {
           console.error(res);
-        } 
+        } else {
+          if (res.body) say.speak('Daniel', res.body);
+        }
+
         // Send the result, whatever it is
         event.sender.send('response', res);
       });
@@ -163,6 +170,11 @@ ipc.on('action', function (event, args) {
 });
 
 /////////////////////////////// Other Functions ////////////////////////////////
+
+var toggle_window = function () {
+  if (main_window.isVisible()) { main_window.hide(); }
+  else { main_window.show(); }
+};
 
 /**
  * Opens a window to login to Facebook
@@ -172,7 +184,7 @@ var fb_login = function () {
     fb_login_win = new BrowserWindow({ width: 400, height: 400 });
   }
   fb_login_win.loadUrl('file://' + __dirname + '/html/facebook.html');
-}
+};
 
 // Attempts to re init FB module
 ipc.on('fb-login', function(event, user, pass) {

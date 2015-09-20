@@ -40,7 +40,7 @@ class iMessage
 
     .then (im) => new Promise (res, rej) ->
       message = message.replace("'", "\'")
-      control 'imessage', ['send', im, "'#{message}'"], (err) ->
+      control 'imessage', ['send', im, "\"#{message}\""], (err) ->
         rej err if err
         res
           status : 'SENT'

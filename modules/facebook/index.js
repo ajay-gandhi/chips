@@ -67,7 +67,7 @@ module.exports = (function () {
    */
   FacebookMessenger.prototype.get_commands = function () {
     return {
-      'facebook :name *message': 'SEND_MESSAGE'
+      'facebook :name *message': 'SEND_MESSAGE',
     }
   }
 

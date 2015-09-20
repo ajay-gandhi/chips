@@ -19,7 +19,8 @@ if (annyang) {
         commands[c] = function () {
           var args = Array.prototype.slice.call(arguments);
 
-          $('div#status').prepend("<p>" + c.split(' ')[0] + ' ' + args.join(' ') + "</p>" );
+
+          $('div#status').prepend("<p>" + c.split(':')[0].split('*')[0] + args.join(' ') + "</p>" );
 
           ipc.send('action', {
             'module': mkey,
@@ -43,7 +44,9 @@ if (annyang) {
 
 // Notify user!
 ipc.on('response', function (res) {
-  new Notification(res.title, res);
+  if (res.title) {
+    new Notification(res.title, res);
+  }
 });
 
 /////////////////////////////////// Settings ///////////////////////////////////

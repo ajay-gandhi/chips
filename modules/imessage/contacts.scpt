@@ -8,7 +8,7 @@ on run argv
   end if
   
   set command to item 1 of argv
-  using terms from application "Messages"
+  using terms from application "Contacts"
     if command is equal to "general" then
       if (count of argv) is equal to 1
         return "error"
@@ -19,6 +19,7 @@ on run argv
           set e to value of every email of (person 1 whose name contains n)
           return {p, e}
         end tell
+        tell application "Contacts" to quit
       end if
     end if
   end using terms from
