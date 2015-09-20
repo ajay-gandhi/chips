@@ -36,8 +36,6 @@ if (annyang) {
   });
 
   // Start listening.
-  annyang.debug();
-
   annyang.start();
 
 } else {
