@@ -90,9 +90,7 @@ app.on('ready', function() {
   ];
 
   current_menu_items = menubar_template;
-
-  var menubar_menu = Menu.buildFromTemplate(menubar_template);
-  menubar.setContextMenu(menubar_menu);
+  update_menu_bar();
 
 ////////////////////////////// Messaging Modules ///////////////////////////////
 
@@ -155,15 +153,13 @@ app.on('ready', function() {
       }, []);
 
       if (addl_menu_items.length) {
-        var new_menu_set = menubar_template
+        current_menu_items = menubar_template
           .slice(0, 1)
           .concat({ type: 'separator' })
           .concat(addl_menu_items)
           .concat(menubar_template.slice(1));
 
-        current_menu_items = new_menu_set;
-        var new_menu = Menu.buildFromTemplate(new_menu_set);
-        menubar.setContextMenu(new_menu);
+        update_menu_bar();
       }
     });
 });
@@ -198,11 +194,6 @@ ipc.on('action', function (event, args) {
   }
 });
 
-var toggle_window = function () {
-  if (main_window.isVisible()) main_window.hide();
-  else                         main_window.show();
-};
-
 ipc.on('try-login', function (event, service, user, pass) {
   var module = require('./modules/' + service + '/index');
 
@@ -225,8 +216,7 @@ ipc.on('try-login', function (event, service, user, pass) {
         current_menu_items = current_menu_items.filter(function (item) {
           return (item.id !== service);
         });
-        var new_menu = Menu.buildFromTemplate(current_menu_items);
-        menubar.setContextMenu(new_menu);
+        update_menu_bar();
 
         // Send new possible commands
         var new_commands = {};
@@ -239,3 +229,28 @@ ipc.on('try-login', function (event, service, user, pass) {
       }
     });
 });
+
+/////////////////////////////// General Functions //////////////////////////////
+
+var toggle_window = function () {
+  if (main_window.isVisible()) main_window.hide();
+  else                         main_window.show();
+
+  current_menu_items = current_menu_items.map(function (item) {
+    if (item.id === 'show-window') {
+      if (main_window.isVisible()) item.label = 'Hide window';
+      else                         item.label = 'Show window';
+
+      return item;
+    } else {
+      return item;
+    }
+  });
+
+  update_menu_bar();
+}
+
+var update_menu_bar = function () {
+  var new_menu = Menu.buildFromTemplate(current_menu_items);
+  menubar.setContextMenu(new_menu);
+}
