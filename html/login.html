@@ -10,6 +10,7 @@
   $(document).ready(function () {
     // Login submitted
     $('form#login-form').submit(function(e) {
+      $('h4#status').html('&nbsp;');
       e.preventDefault();
       $('button#submit').prop('disabled', true);
       var user = $('input#username').val();
