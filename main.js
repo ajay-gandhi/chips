@@ -43,8 +43,8 @@ app.on('ready', function() {
 
   // Create login window
   login_window = new BrowserWindow({
-    width:  250,
-    height: 300,
+    width:  300,
+    height: 200,
     resizable: false,
     fullscreen: false,
     'title-bar-style': 'hidden'
@@ -55,6 +55,12 @@ app.on('ready', function() {
   // Just hide window, never close it
   main_window.on('close', function (e) {
     main_window.hide();
+    e.preventDefault();
+  });
+
+  // Just hide window, never close it
+  main_window.on('close', function (e) {
+    login_window.hide();
     e.preventDefault();
   });
 
@@ -132,9 +138,9 @@ app.on('ready', function() {
         if (module.menu_login && !ready_services[path]) {
           var module_name = module.menu_login();
           return acc.concat({
-            id:    module_name,
+            id:    module_name.toLowerCase(),
             label: 'Login to ' + module_name,
-            click: create_login_requester(module_name.toLowerCase())
+            click: create_login_requester(module_name)
           });
         } else {
           return acc;
@@ -204,6 +210,7 @@ ipc.on('try-login', function (event, service, user, pass) {
         current_menu_items = current_menu_items.filter(function (item) {
           return (item.id !== service);
         });
+        console.log(current_menu_items);
         var new_menu = Menu.buildFromTemplate(current_menu_items);
         menubar.setContextMenu(new_menu);
 

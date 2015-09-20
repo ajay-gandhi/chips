@@ -13,11 +13,9 @@ if (annyang) {
   // Receive the modules' commands
   ipc.on('commands', function (modules) {
 
-    console.log(modules['facebook']);
     var commands = {};
     Object.keys(modules).forEach(function (mkey) {
       Object.keys(modules[mkey]).forEach(function (c) {
-        console.log(mkey, c);
         commands[c] = function () {
           var args = Array.prototype.slice.call(arguments);
 
