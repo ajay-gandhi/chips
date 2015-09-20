@@ -30,6 +30,8 @@ var menubar_template,
 
 var ready_services = {};
 
+var should_close = false;
+
 // Hide dock icon
 // app.dock.hide();
 
@@ -38,7 +40,8 @@ app.on('ready', function() {
   main_window = new BrowserWindow({
     width:  250,
     height: 300,
-    'title-bar-style': 'hidden'
+    'title-bar-style': 'hidden',
+    icon: __dirname + '/assets/icon_512x512.png'
   });
   main_window.loadUrl('file://' + __dirname + '/html/index.html');
 
@@ -54,15 +57,15 @@ app.on('ready', function() {
   login_window.hide();
 
   // Just hide window, never close it
-  main_window.on('close', function (e) {
+  login_window.on('close', function (e) {
     main_window.hide();
-    e.preventDefault();
+    if (!should_close) e.preventDefault();
   });
 
   // Just hide window, never close it
   main_window.on('close', function (e) {
     login_window.hide();
-    e.preventDefault();
+    if (!should_close) e.preventDefault();
   });
 
   // Register a 'ctrl+`' shortcut listener.
@@ -84,9 +87,12 @@ app.on('ready', function() {
     { type    : 'separator' },
     {
       label: 'Quit',
-      accelerator: 'Command+Q',
-      click: function() { app.quit(); }
-    },
+      click: function() {
+        should_close = true;
+        main_window.close();
+        app.quit();
+      }
+    }
   ];
 
   current_menu_items = menubar_template;
