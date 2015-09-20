@@ -31,7 +31,7 @@ var menubar_template,
 var ready_services = {};
 
 // Hide dock icon
-app.dock.hide();
+// app.dock.hide();
 
 app.on('ready', function() {
   // Create the main window
@@ -135,7 +135,9 @@ app.on('ready', function() {
         }
       });
 
-      main_window.webContents.send('commands', module_commands);
+      main_window.webContents.on('did-finish-load', function () {
+        main_window.webContents.send('commands', module_commands);
+      });
 
       // Add menu bar items
       var addl_menu_items = module_dirs.reduce(function (acc, path) {

@@ -2,23 +2,22 @@
 /* global require, console, annyang, window, $ */
 
 var ipc = require('ipc');
-var ui = {
-  wave : 'listening'
-}
 
 ////////////////////////////////// Messaging ///////////////////////////////////
 
 if (annyang) {
-
   // Receive the modules' commands
+  
+  console.log('asdkfjlaksdf')
   ipc.on('commands', function (modules) {
+    console.log('asdfaksjdflkjaskldf')
 
+    console.log(modules)
     var commands = {};
     Object.keys(modules).forEach(function (mkey) {
       Object.keys(modules[mkey]).forEach(function (c) {
         commands[c] = function () {
           var args = Array.prototype.slice.call(arguments);
-
 
           $('div#status').prepend("<p>" + c.split(':')[0].split('*')[0] + args.join(' ') + "</p>" );
 
@@ -37,6 +36,8 @@ if (annyang) {
   });
 
   // Start listening.
+  annyang.debug();
+
   annyang.start();
 
 } else {
@@ -45,9 +46,7 @@ if (annyang) {
 
 // Notify user!
 ipc.on('response', function (res) {
-  if (res.title) {
-    new Notification(res.title, res);
-  }
+  if (res.title) new Notification(res.title, res);
 });
 
 /////////////////////////////////// Settings ///////////////////////////////////
