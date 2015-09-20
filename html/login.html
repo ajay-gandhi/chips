@@ -29,7 +29,7 @@
   // Receive service name
   ipc.on('service-name', function (name) {
     service = name.toLowerCase();
-    $('h1#name').text('Login to ' + name);
+    $('h2#name').text('Login to ' + name);
   });
   </script>
   <style>
@@ -42,11 +42,6 @@
       font-family: 'Menlo', 'Andale Mono', monospace;
       overflow: none;
     }
-    
-    canvas {
-      width: 200px;
-      height: 100px;
-    }
 
     body {
       display: flex;
@@ -56,21 +51,37 @@
       height: 100vh;
     }
 
-    #status {
-      overflow-y: scroll;
-      flex: 1;
-      width: 100%;
+    h2#name {
+      margin: 10px 0 0 0;
+    }
+    h3#status {
+      margin: 15px 0;
+      color: red;
+      font-weight: lighter;
+    }
 
+    input {
+      outline: none;
+      color: #DC3522;
+      font-size: 14px;
+      margin: 2px 0;
+      padding: 3px;
+      border: 1px solid #D9CB9E;
+      border-radius: 3px;
+      background-color: #374140;
+    }
+    button {
+      outline: none;
     }
   </style>
 </head>
 <body>
-  <h1 id="name">Login</h1>
-  <h3 id="status"></h3>
+  <h2 id="name">Login</h2>
+  <h3 id="status">&nbsp;</h3>
   <form id="login-form">
-    <input type="text" id="username" /><br />
-    <input type="password" id="password" /><br />
-    <button id="submit">Save</button>
+    <input type="text" id="username" placeholder="Username" /><br />
+    <input type="password" id="password" placeholder="Password" /><br />
+    <button id="submit">Login</button>
   </form>
 </body>
 </html>
