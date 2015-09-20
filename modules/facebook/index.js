@@ -7,28 +7,29 @@ module.exports = (function () {
 
   function FacebookMessenger() {
     this.browser = new Plant();
-    this.email;
     this.home = 'https://m.facebook.com';
   }
 
   /**
    * Initializes the Facebook object by logging into Facebook headlessly
    *
-   * @param [Object] conf - An instance of Configstore for the app
+   * @param [Object] conf - An object that supports setting and getting configs
    *
    * @returns Promise - Resolves to the initialized object (self) or rejects
    */
-  FacebookMessenger.prototype.init = function (conf) {
+  FacebookMessenger.prototype.init = function (creds) {
     var self = this;
 
-    var creds = {
-      email: conf.get('fb-username'),
-      pass:  conf.get('fb-password')
+    if (!creds) return new Promise(function (r) { r(false); });
+
+    var proper_props = {
+      email: creds.username,
+      pass:  creds.password
     }
 
     var options = {
       url:    self.home + '/login.php',
-      body:   qs.stringify(creds),
+      body:   qs.stringify(proper_props),
       method: 'POST'
     }
 
@@ -41,20 +42,21 @@ module.exports = (function () {
           if (e.statusCode == 302) {
             return self.browser.visit(self.home);
           } else {
-            reject();
+            resolve(false);
           }
         })
         .then(function ($) {
-          // Confirm login
+          // Login successful
           if ($('title').text() === 'Facebook') {
-            self.email = creds.email;
             resolve(self);
+
+          // Failed
           } else {
-            reject('Login failed.');
+            resolve(false);
           }
         })
         .catch(function (e) {
-          reject(e);
+          resolve(false);
         });
     });
   }
@@ -112,6 +114,13 @@ module.exports = (function () {
             });
           });
     });
+  }
+
+  /**
+   * Returns a string for identifying this service during login
+   */
+  FacebookMessenger.prototype.menu_login = function () {
+    return 'Facebook';
   }
 
   return new FacebookMessenger();

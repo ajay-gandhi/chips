@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Login to Facebook :: Chips</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.js"></script>
+  <script>
+  var ipc = require('ipc');
+  var service;
+
+  $(document).ready(function () {
+    // Login submitted
+    $('form#login-form').submit(function(e) {
+      e.preventDefault();
+      $('button#submit').prop('disabled', true);
+      var user = $('input#username').val();
+      var pass = $('input#password').val()
+      ipc.send('try-login', service, user, pass);
+    });
+  });
+
+  // Login successful
+  ipc.on('login-success', function (success) {
+    if (!success) {
+      $('button#submit').prop('disabled', false);
+      $('h3#status').text('Login failed.');
+    }
+  });
+
+  // Receive service name
+  ipc.on('service-name', function (name) {
+    service = name;
+    $('h1#name').text('Login to ' + name);
+  });
+  </script>
+</head>
+<body>
+  <h1 id="name">Login</h1>
+  <h3 id="status"></h3>
+  <form id="login-form">
+    <input type="text" id="username" /><br />
+    <input type="password" id="password" /><br />
+    <button id="submit">Save</button>
+  </form>
+</body>
+</html>

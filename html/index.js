@@ -13,9 +13,11 @@ if (annyang) {
   // Receive the modules' commands
   ipc.on('commands', function (modules) {
 
+    console.log(modules['facebook']);
     var commands = {};
     Object.keys(modules).forEach(function (mkey) {
       Object.keys(modules[mkey]).forEach(function (c) {
+        console.log(mkey, c);
         commands[c] = function () {
           var args = Array.prototype.slice.call(arguments);
 
@@ -33,9 +35,10 @@ if (annyang) {
     // Add our commands to annyang
     annyang.addCommands(commands);
 
-    // Start listening.
-    annyang.start();
   });
+
+  // Start listening.
+  annyang.start();
 
 } else {
   console.log('Annyang is not included.');
