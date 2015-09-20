@@ -33,7 +33,7 @@ var ready_services = {};
 var should_close = false;
 
 // Hide dock icon
-// app.dock.hide();
+app.dock.hide();
 
 app.on('ready', function() {
   // Create the main window
@@ -49,7 +49,7 @@ app.on('ready', function() {
   login_window = new BrowserWindow({
     width:  300,
     height: 200,
-    // resizable: false,
+    resizable: false,
     fullscreen: false,
     'title-bar-style': 'hidden'
   });
@@ -80,14 +80,19 @@ app.on('ready', function() {
       label   : 'Listening!',
       enabled : false
     },
+    {
+      label   : 'Stop listening',
+      click   : toggle_listening
+    },
+    { type    : 'separator' },
     { id      : 'show-window',
       label   : 'Show window',
       click   : toggle_window
     },
     { type    : 'separator' },
     {
-      label: 'Quit',
-      click: function() {
+      label   : 'Quit',
+      click   : function() {
         should_close = true;
         main_window.close();
         app.quit();
@@ -161,10 +166,10 @@ app.on('ready', function() {
 
       if (addl_menu_items.length) {
         current_menu_items = menubar_template
-          .slice(0, 1)
+          .slice(0, 4)
           .concat({ type: 'separator' })
           .concat(addl_menu_items)
-          .concat(menubar_template.slice(1));
+          .concat(menubar_template.slice(4));
 
         update_menu_bar();
       }
@@ -260,4 +265,20 @@ var toggle_window = function () {
 var update_menu_bar = function () {
   var new_menu = Menu.buildFromTemplate(current_menu_items);
   menubar.setContextMenu(new_menu);
+}
+
+var is_listening = true;
+var toggle_listening = function () {
+  is_listening = !is_listening;
+  main_window.webContents.send('toggle-listening', is_listening);
+
+  if (is_listening) {
+    current_menu_items[0].label = 'Listening!';
+    current_menu_items[1].label = 'Stop listening';
+  } else {
+    current_menu_items[0].label = 'Not listening';
+    current_menu_items[1].label = 'Start listening';
+  }
+
+  update_menu_bar();
 }

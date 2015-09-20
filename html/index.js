@@ -8,11 +8,8 @@ var ipc = require('ipc');
 if (annyang) {
   // Receive the modules' commands
   
-  console.log('asdkfjlaksdf')
   ipc.on('commands', function (modules) {
-    console.log('asdfaksjdflkjaskldf')
 
-    console.log(modules)
     var commands = {};
     Object.keys(modules).forEach(function (mkey) {
       Object.keys(modules[mkey]).forEach(function (c) {
@@ -45,6 +42,12 @@ if (annyang) {
 // Notify user!
 ipc.on('response', function (res) {
   if (res.title) new Notification(res.title, res);
+});
+
+// Stop listening
+ipc.on('toggle-listening', function (toggle) {
+  if (toggle) annyang.start();
+  else        annyang.abort();
 });
 
 /////////////////////////////////// Settings ///////////////////////////////////
