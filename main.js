@@ -33,7 +33,7 @@ var ready_services = {};
 var should_close = false;
 
 // Hide dock icon
-// app.dock.hide();
+app.dock.hide();
 
 app.on('ready', function() {
   // Create the main window
